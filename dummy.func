@@ -1,0 +1,91 @@
+#!/bin/bash
+# file: dummy.func
+
+WORK_DIR=$(pwd)/dummy_tmp
+
+create_file() {
+    if [[ $1 == "" ]]; then
+        return 1
+    fi
+
+    local file_name=$1
+    if [ -e ${WORK_DIR}/${file_name} ]; then
+        return 1
+    fi
+
+    touch ${WORK_DIR}/${file_name} 2>/dev/null
+    if [[ $? != 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+delete_file() {
+    if [[ $1 == "" ]]; then
+        return 1
+    fi
+
+    local file_name=$1
+    rm -f ${WORK_DIR}/${file_name} 2>/dev/null
+    if [[ $? != 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+read_file() {
+    if [[ $1 == "" ]]; then
+        return 1
+    fi
+
+    local file_name=$1
+    cat ${WORK_DIR}/${file_name} 2>/dev/null
+    if [[ $? != 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+# If param file not exists, this function return error.
+write_file() {
+    if [[ $1 == "" || $2 == "" ]]; then
+        return 1
+    fi
+
+    local file_name=$1
+    local out_string=$2
+    
+    # Check file not found.
+    if [[ ! -e ${WORK_DIR}/${file_name} ]]; then
+        return 1
+    fi
+
+    echo "${out_string}" > ${WORK_DIR}/${file_name} 2>/dev/null
+    if [[ $? != 0 ]]; then
+        return 1
+    fi
+    
+    return 0
+}
+
+# If param file not exists, this function return error.
+add_write_file() {
+    if [[ $1 == "" || $2 == "" ]]; then
+        return 1
+    fi
+
+    local file_name=$1
+    local out_string=$2
+    
+    # Check file not found.
+    if [[ ! -e ${WORK_DIR}/${file_name} ]]; then
+        return 1
+    fi
+
+    echo "${out_string}" >> ${WORK_DIR}/${file_name} 2>/dev/null
+    if [[ $? != 0 ]]; then
+        return 1
+    fi
+    
+    return 0
+}

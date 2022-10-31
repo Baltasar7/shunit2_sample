@@ -1,0 +1,81 @@
+#!/bin/bash
+# file: dummy.test
+# test_target: dummy.func
+
+###############################################################################
+## Unit test Framework functions ##
+oneTimeSetUp() {
+    . $(pwd)/dummy.func
+}
+
+setUp() {
+    mkdir $(pwd)/dummy_tmp
+}
+
+tearDown() {
+    rm -rf $(pwd)/dummy_tmp
+}
+
+oneTimeTearDown() {
+    :
+}
+
+###############################################################################
+## Test functions ##
+testCreateFileOk() {
+    local file_name="work"
+    create_file ${file_name}
+    assertEquals "ret val NG." "0" "$?"
+    assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+}
+
+testCreateFileNgParamNone() {
+    local file_name="work"
+    create_file
+    assertNotEquals "ret val OK." "0" "$?"
+    assertFalse "creating file found." "[ -e ${WORK_DIR}/${file_name} ]"
+}
+
+testCreateFileNgFileDuplication() {
+    local file_name="work"
+
+    # 1st time: success
+    create_file ${file_name}
+    assertEquals "ret val NG." "0" "$?"
+    assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+    
+    # 2nd time: failure (cause: file duplication)
+    create_file ${file_name}
+    assertNotEquals "ret val OK." "0" "$?"
+    assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+}
+
+testWriteFileOk() {
+    local file_name="work"
+    local string="abcdef12345"
+
+    create_file ${file_name}
+    assertEquals "ret val NG." "0" "$?"
+    assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+
+    write_file ${file_name} ${string}
+    assertEquals "ret val NG." "0" "$?"
+    assertTrue "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name}) ]]"
+
+    echo "expect string: ${string}"
+    echo "file contents: $(cat ${WORK_DIR}/${file_name})"
+}
+
+testWriteFileNgFileNotFound() {
+    local file_name="work"
+    local string="abcdef12345"
+
+    write_file ${file_name} ${string}
+    assertNotEquals "ret val NG." "0" "$?"
+    assertFalse "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name}) ]]"
+}
+
+
+###############################################################################
+# Load and run shUnit2.
+. ~/shunit2/shunit2
