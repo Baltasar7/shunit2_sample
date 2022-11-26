@@ -57,6 +57,7 @@ write_file() {
     
     # Check file not found.
     if [[ ! -e ${WORK_DIR}/${file_name} ]]; then
+        logger -i -p daemon.err "${FUNCNAME[0]} file(${file_name}) not found."
         return 1
     fi
 

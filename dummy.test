@@ -2,10 +2,15 @@
 # file: dummy.test
 # test_target: dummy.func
 
+##
+## Memo: date; echo ""; sudo journalctl --since="$(date -d '30 second ago' '+%Y-%m-%d %H:%M:%S')" --no-pager
+##
+
 ###############################################################################
 ## Unit test Framework functions ##
 oneTimeSetUp() {
     . $(pwd)/dummy.func
+    echo "$(date)"
 }
 
 setUp() {
@@ -62,8 +67,8 @@ testWriteFileOk() {
     assertEquals "ret val NG." "0" "$?"
     assertTrue "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name}) ]]"
 
-    echo "expect string: ${string}"
-    echo "file contents: $(cat ${WORK_DIR}/${file_name})"
+    echo "  expect string: ${string}"
+    echo "  file contents: $(cat ${WORK_DIR}/${file_name})"
 }
 
 testWriteFileNgFileNotFound() {
@@ -71,8 +76,8 @@ testWriteFileNgFileNotFound() {
     local string="abcdef12345"
 
     write_file ${file_name} ${string}
-    assertNotEquals "ret val NG." "0" "$?"
-    assertFalse "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name}) ]]"
+    assertEquals "ret val NG." "1" "$?"
+    assertFalse "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name} 2> /dev/null) ]]"
 }
 
 
