@@ -9,7 +9,12 @@
 ###############################################################################
 ## Unit test Framework functions ##
 oneTimeSetUp() {
+    # Load test library
+    . ./testlib
+    
+    # Load test target
     . $(pwd)/dummy.func
+
     echo "$(date)"
 }
 
@@ -32,6 +37,8 @@ testCreateFileOk() {
     create_file ${file_name}
     assertEquals "ret val NG." "0" "$?"
     assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+
+    return 0
 }
 
 testCreateFileNgParamNone() {
@@ -39,6 +46,8 @@ testCreateFileNgParamNone() {
     create_file
     assertNotEquals "ret val OK." "0" "$?"
     assertFalse "creating file found." "[ -e ${WORK_DIR}/${file_name} ]"
+
+    return 0
 }
 
 testCreateFileNgFileDuplication() {
@@ -53,6 +62,8 @@ testCreateFileNgFileDuplication() {
     create_file ${file_name}
     assertNotEquals "ret val OK." "0" "$?"
     assertTrue "creating file not found." "[ -e ${WORK_DIR}/${file_name} ]"
+
+    return 0
 }
 
 testWriteFileOk() {
@@ -69,6 +80,8 @@ testWriteFileOk() {
 
     echo "  expect string: ${string}"
     echo "  file contents: $(cat ${WORK_DIR}/${file_name})"
+
+    return 0
 }
 
 testWriteFileNgFileNotFound() {
@@ -78,6 +91,11 @@ testWriteFileNgFileNotFound() {
     write_file ${file_name} ${string}
     assertEquals "ret val NG." "1" "$?"
     assertFalse "file contents is different than expected." "[[ \"${string}\" == $(cat ${WORK_DIR}/${file_name} 2> /dev/null) ]]"
+    
+    testlib_is_journallog_last2sec_exists "file(${file_name}) not found"
+    assertEquals "journallog not exists" "0" "$?"
+
+    return 0
 }
 
 

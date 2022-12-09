@@ -1,0 +1,7 @@
+#!/bin/bash
+
+testlib_is_journallog_last2sec_exists() {
+    local grep_string=$1
+    sudo journalctl --since="$(date -d '2 second ago' '+%Y-%m-%d %H:%M:%S')" --no-pager | grep "${grep_string}" > /dev/null 2>&1
+    return $?
+}
